@@ -1,7 +1,49 @@
 #include <Arduino.h>
 #include <iodefs.h>
-#include <wifi.h>
+#include <WiFi.h>
+#include <MQTT.h>
+#include <secrets.h>
 #include <utils.h>
+
+const char ssid[] = SECRET_SSID;
+const char pass[] = SECRET_PASS;
+const char mqtt_host[] = " need-for-speed.cloud.shiftr.io";
+
+WiFiClient net;
+MQTTClient client;
+
+unsigned long lastMillis = 0;
+
+void connect()
+{
+    Serial.print("checking wifi...");
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        Serial.print(".");
+        delay(1000);
+    }
+
+    Serial.print("\nconnecting...");
+    while (!client.connect("arduino", "need-for-speed", "Qo7h3F9ZejnTq1uA"))
+    {
+        Serial.print(".");
+        delay(1000);
+    }
+
+    Serial.println("\nconnected!");
+
+    client.subscribe("hello");
+}
+
+void messageReceived(String &topic, String &payload)
+{
+    Serial.println(topic + ": " + payload);
+    // PSEUDOCODE
+    // if topic == "/a":
+    //      set_motor(M1, payload)
+    // if topic == "/b":
+    //      set_motor(M2, payload)
+}
 
 int i = 0;
 int up = true;
@@ -27,17 +69,26 @@ void setup()
         pinMode(yel_leds[i], OUTPUT);
         pinMode(red_leds[i], OUTPUT);
     }
-    connect_wifi(R1);
-    print_wifi_info();
+
+    WiFi.begin(ssid, pass);
+    client.begin(mqtt_host, net);
+    client.onMessage(messageReceived);
+
     Serial.print("BOOT COMPLETE");
 }
 
 void loop()
 {
     // Simple serial test interface:
-    // 
+    //
     while (Serial.available())
     {
+        client.loop();
+        if (!client.connected())
+        {
+            connect();
+        }
+
         char c = Serial.read();
         bfr += c;
         if (c == 'a')
