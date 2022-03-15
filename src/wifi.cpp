@@ -1,6 +1,4 @@
-#include <Arduino.h>
-#include <WiFiNINA.h>
-#include "secrets.h"
+#include <wifi.h>
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
 char ssid[] = SECRET_SSID;        // your network SSID (name)
@@ -31,8 +29,9 @@ void print_wifi_info() {
   Serial.println();
 }
 
-void connect_wifi()
+void connect_wifi(int blinkme)
 {
+    digitalWrite(blinkme, HIGH);
     while (!Serial);
 
     // attempt to connect to Wifi network:
@@ -53,4 +52,5 @@ void connect_wifi()
     Serial.println("----------------------------------------");
     print_wifi_info();
     Serial.println("----------------------------------------");
+    digitalWrite(blinkme, LOW);
 }

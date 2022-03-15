@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <iodefs.h>
+#include <wifi.h>
+#include <utils.h>
 
 int i = 0;
 int up = true;
@@ -25,6 +27,9 @@ void setup()
         pinMode(yel_leds[i], OUTPUT);
         pinMode(red_leds[i], OUTPUT);
     }
+    connect_wifi(R1);
+    print_wifi_info();
+    Serial.print("BOOT COMPLETE");
 }
 
 void loop()
@@ -49,10 +54,7 @@ void loop()
         { // Command recevied and ready.
             int v = bfr.toInt();
             v = v > 0xFF ? 0xFF : v;
-            Serial.print(pin);
-            Serial.print(" >> ");
-            Serial.println(v, HEX);
-            analogWrite(pin, v);
+            set_motor(pin, v);
             bfr = ""; // Clear the string ready for the next command.
         }
     }
