@@ -7,7 +7,7 @@
 
 const char ssid[] = SECRET_SSID;
 const char pass[] = SECRET_PASS;
-const char mqtt_host[] = " need-for-speed.cloud.shiftr.io";
+const char mqtt_host[] = "need-for-speed.cloud.shiftr.io";
 
 WiFiClient net;
 MQTTClient client;
